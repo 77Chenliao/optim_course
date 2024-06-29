@@ -1,12 +1,13 @@
 from __future__ import annotations
-
+from tqdm import tqdm
 import random
-
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from REINFORCE import REINFORCE
 from REINFORCE_SAG import REINFORCE_SAG
+from REINFORCE_SGD import REINFORCE_SGD
+from REINFORCE_SVRG import REINFORCE_SVRG
 import gym
 import pandas as pd
 import seaborn as sns
@@ -32,14 +33,18 @@ random.seed(seed)
 np.random.seed(seed)
 
 # Reinitialize agent every seed
-optim = 'base' # [base, SAG]
+optim = 'SVRG' # [base, SAG, SGD, SVRG]
 if optim == 'base':
     agent = REINFORCE(obs_space_dims, action_space_dims)
 elif optim == 'SAG':
     agent = REINFORCE_SAG(obs_space_dims, action_space_dims)
+elif optim == 'SGD':
+    agent = REINFORCE_SGD(obs_space_dims, action_space_dims)
+elif optim == 'SVRG':
+    agent = REINFORCE_SVRG(obs_space_dims, action_space_dims)
 reward_over_episodes = []
 
-for episode in range(total_num_episodes):
+for episode in tqdm(range(total_num_episodes)):
     # gymnasium v26 requires users to set seed while resetting the environment
     obs, info = wrapped_env.reset(seed=seed)
     done = False
